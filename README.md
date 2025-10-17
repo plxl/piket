@@ -13,14 +13,18 @@ Currently only ships with confirmed-working Windows binaries. Linux and macOS ar
   - `PikECard`: manipulate the primary card data
   - `PikELevel`: manipulate individual level data (`set_camera`, `set_character`, `set_tile`, etc.)
 
+## Installation
+Easily include Piket in your projects with `pip`:
+```
+pip install piket
+```
+
 ## Demo
 Try Piket now with the **Converter Demo**!
 ```
-git clone https://github.com/plxl/piket
-cd piket
 python -m venv .venv
 .venv\Scripts\activate # or source .venv/bin/activate
-pip install ".[demo]"
+pip install piket[demo]
 python -m piket.converter_demo
 ```
 This demo allows you to easily drag-and-drop .raw files and get decoded .bin files, and then vice versa!

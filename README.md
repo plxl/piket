@@ -34,6 +34,7 @@ card = piket.decode_raw("card.raw")
 card[0x115] = 0x1 # set tile (0, 0) to grass
 new_raw = piket.encode_raw("card.raw", card)
 ```
+For more detailed usage, check the dedicated [Usage Guide](https://github.com/plxl/piket/blob/main/docs/usage_guide.md).
 
 ## Acknowledgements
 - [Caitsith2](https://caitsith2.com/ereader/devtools.htm): Original e-Reader Tools (nedclib)

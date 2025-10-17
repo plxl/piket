@@ -29,20 +29,10 @@ This demo allows you to easily drag-and-drop .raw files and get decoded .bin fil
 Use Piket to easily decode, manipulate, and then re-encode `.raw` card files.
 ```py
 import piket
-from pathlib import Path
 
-# accepts file strings or Paths
 card = piket.decode_raw("card.raw")
-
-# accepts bytes / bytearray
-with open("card.raw", "rb") as f:
-    card = piket.decode_raw(f.read())
-
-# decoding returns bytearray for manipulation
-card[0x115] = 0x1 # set first tile to grass (Plucking Pikmin)
-
-# easy to re-encode
-Path("new_card.raw").write_bytes(piket.encode_raw(card, "card.raw"))
+card[0x115] = 0x1 # set tile (0, 0) to grass
+new_raw = piket.encode_raw("card.raw", card)
 ```
 
 ## Acknowledgements

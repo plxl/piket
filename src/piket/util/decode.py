@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from piket import NEDCENC, NEVPK, HEADERFIX
+from piket import NEDCENC, NEVPK
 from piket.constants import VPK_SIZE, VPK
 from . import _to_bytes, _run_tool
 

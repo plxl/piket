@@ -25,7 +25,7 @@ Try Piket now with the **Converter Demo**!
 python -m venv .venv
 .venv\Scripts\activate # or source .venv/bin/activate
 pip install piket[demo]
-python -m piket.converter_demo
+python -m piket.converter
 ```
 This demo allows you to easily drag-and-drop .raw files and get decoded .bin files, and then vice versa!
 

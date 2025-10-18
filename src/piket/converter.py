@@ -55,11 +55,11 @@ class ConverterApp:
     
     def process_raw_file(self, file: Path):
         out = file.with_suffix(".bin")
-        out.write_bytes(piket.decode_raw(file))
+        out.write_bytes(piket.decode(file))
         
     def process_bin_file(self, file: Path, original_raw: Path):
         out = original_raw.with_stem(original_raw.stem + "_new")
-        out.write_bytes(piket.encode_raw(original_raw, file))
+        out.write_bytes(piket.encode(file, original_raw))
 
 if __name__ == "__main__":
     root = TkinterDnD.Tk()

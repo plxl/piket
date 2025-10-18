@@ -1,85 +1,13 @@
-import subprocess
 import logging
 from pathlib import Path
-from . import NEDCENC, NEVPK, HEADERFIX
-from .constants import SIZE_INFO, VPK_SIZE, VPK
+from piket import NEDCENC, NEVPK, HEADERFIX
+from piket.constants import SIZE_INFO, VPK_SIZE, VPK
+from . import _to_bytes, _run_tool
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__file__)
 
-def _to_bytes(data: bytes | bytearray | str | Path) -> bytes:
-    if isinstance(data, (bytes, bytearray)):
-        return bytes(data)
-    elif isinstance(data, (str, Path)):
-        with open(data, "rb") as f:
-            return f.read()
-    else:
-        raise TypeError("Expected bytes, bytearray, or file path (str/Path).")
-
-def _run_tool(command: str):
-    result = subprocess.run(
-        command,
-        capture_output=True,
-        text=True,
-        shell=True # kept getting FileNotFound for long filenames w/ shell=False + commmand list[]
-    )
-
-    if result.stdout:
-        for line in result.stdout.splitlines():
-            logger.debug(line)
-
-    if result.stderr:
-        for line in result.stderr.splitlines():
-            logger.error(line)
-
-    if result.returncode != 0:
-        raise subprocess.CalledProcessError(result.returncode, command)
-
-def decode_raw(data: bytes | bytearray | str | Path) -> bytearray:
-    # handle all input types
-    data = _to_bytes(data)
-    file = NEDCENC.parent.resolve() / "in.raw"
-    logger.debug(f"Writing .raw data to '{file}'.")
-    file.write_bytes(data)
-
-    PARENT = NEDCENC.parent.resolve()
-
-    # decode .raw to .bin (includes a vpk compression block which we will extract)
-    decoded_path = PARENT / "decoded.bin"
-    logger.debug(f"Running nedcenc, output to '{decoded_path}'.")
-    _run_tool(f'"{NEDCENC}" -i "{file}" -d -o "{decoded_path}"')
-    logger.debug(f"Removing '{file}'.")
-    file.unlink()
-    if not decoded_path.exists():
-        raise Exception("nedcenc did not output a file.")
-
-    # trim the decoded .bin to the vpk block (compressed level data)
-    trimmed_path = PARENT / "trimmed.vpk"
-    decoded = decoded_path.read_bytes()
-    logger.debug(f"Removing '{decoded_path}'.")
-    decoded_path.unlink()
-
-    logger.debug("Trimming decoded .raw data to VPK block.")
-    size = int.from_bytes(decoded[VPK_SIZE:VPK_SIZE+2], "little")
-    trimmed_path.write_bytes(decoded[VPK:VPK+size])
-
-    # decompress the vpk block into pure level data (.bin again)
-    decompressed_path = PARENT / "out.bin"
-    logger.debug(f"Running nevpk, output to '{decompressed_path}'.")
-    _run_tool(f'"{NEVPK}" -i "{trimmed_path}" -d -o "{decompressed_path}"')
-    logger.debug(f"Removing '{trimmed_path}'.")
-    trimmed_path.unlink()
-    if not decompressed_path.exists():
-        raise Exception("nevpk did not output a file.")
-
-    data = decompressed_path.read_bytes()
-    logger.debug(f"Removing '{decompressed_path}'.")
-    decompressed_path.unlink()
-    
-    logger.info("Conversion from .raw to .bin (decompressed) complete.")
-    return bytearray(data)
-
-def encode_raw(original: bytes | bytearray | str | Path,
-               data: bytes | bytearray | str | Path) -> bytearray:
+def encode(data: bytes | bytearray | str | Path,
+           original: bytes | bytearray | str | Path) -> bytearray:
     # handle all input types
     original = _to_bytes(original)
     original_file = NEDCENC.parent.resolve() / "original.raw"

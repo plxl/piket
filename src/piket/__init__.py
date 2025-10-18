@@ -32,6 +32,6 @@ NEVPK = _TOOL_PATHS["nevpk"]
 HEADERFIX = _TOOL_PATHS["headerfix"]
 
 # expose functions
-from .main import decode_raw, encode_raw
+from .util import decode, encode
 
 __all__ = ["NEDCENC", "NEVPK", "HEADERFIX"]

@@ -34,9 +34,9 @@ Use Piket to easily decode, manipulate, and then re-encode `.raw` card files.
 ```py
 import piket
 
-card = piket.decode_raw("card.raw")
+card = piket.decode("card.raw")
 card[0x115] = 0x1 # set tile (0, 0) to grass
-new_raw = piket.encode_raw("card.raw", card)
+new_raw = piket.encode(card, "card.raw")
 ```
 For more detailed usage, check the dedicated [Usage Guide](https://github.com/plxl/piket/blob/main/docs/usage_guide.md).
 

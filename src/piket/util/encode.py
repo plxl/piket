@@ -6,8 +6,11 @@ from . import _to_bytes, _run_tool
 
 logger = logging.getLogger(__file__)
 
-def encode(data: bytes | bytearray | str | Path,
-           original: bytes | bytearray | str | Path) -> bytearray:
+def encode(
+    data: bytes | bytearray | str | Path,
+    original: bytes | bytearray | str | Path,
+    partial_encode: bool = False,
+) -> bytearray:
     # handle all input types
     original = _to_bytes(original)
     original_file = NEDCENC.parent.resolve() / "original.raw"
@@ -73,6 +76,12 @@ def encode(data: bytes | bytearray | str | Path,
     # note that headerfix writes the new file in-place
     logger.debug("Running headerfix, output in-place at '{decoded_path}'.")
     _run_tool(f'"{HEADERFIX}" "{decoded_path}"')
+
+    if partial_encode:
+        decoded = decoded_path.read_bytes()
+        logger.debug(f"Removing '{decoded_path}'.")
+        decoded_path.unlink()
+        return bytearray(decoded)
 
     raw_path = PARENT / "card.raw"
     logger.debug(f"Running nedcenc, output to '{raw_path}'.")

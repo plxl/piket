@@ -64,11 +64,6 @@ def encode(data: bytes | bytearray | str | Path,
     # write incremenetal padding
     for i in range(VPK + size, 0x530):
         decoded[i] = (i - (VPK + size)) % 0x100
-    # write PIKMINCARD 1S ending
-    decoded[0x530:0x540] = bytes([
-        0x00, 0x00, 0x50, 0x49, 0x4B, 0x4D, 0x49, 0x4E,
-        0x43, 0x41, 0x52, 0x44, 0x00, 0x31, 0x53, 0x00
-    ])
     
     decoded_path = PARENT / "decoded.bin"
     logger.debug(f"Writing rebuilt decoded data to '{decoded_path}'.")

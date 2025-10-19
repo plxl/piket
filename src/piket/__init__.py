@@ -1,26 +1,60 @@
 import sys
+import platform
 import importlib.resources as resources
 from pathlib import Path
 
 _TOOLS = {
-    "win32": {
+    "windows": {
         "libnedclib": "libnedclib.dll",
         "nedcenc": "nedcenc.exe",
         "nevpk": "nevpk.exe",
-        "headerfix": "headerfix.exe"
+    },
+    "darwin": {
+        "libnedclib": "libnedclib.dylib",
+        "nedcenc": "nedcenc",
+        "nevpk": "nevpk",
+    },
+    "linux": {
+        "libnedclib": "libnedclib.so",
+        "nedcenc": "nedcenc",
+        "nevpk": "nevpk",
     }
 }
 
+def get_machine():
+    os_name = sys.platform
+    machine = platform.machine().lower()
+
+    # Normalize OS name
+    if os_name.startswith("linux"):
+        os_name = "linux"
+    elif os_name == "darwin":
+        os_name = "macos"
+    elif os_name in ("win32", "cygwin", "msys"):
+        os_name = "windows"
+
+    # Normalize architecture
+    if machine in ("amd64", "x86_64"):
+        arch = "amd64"
+    elif machine in ("aarch64", "arm64"):
+        arch = "arm64"
+    else:
+        arch = machine
+
+    return f"{os_name}-{arch}"
+
+
 # validate platform os support
+machine = get_machine()
 platform_tools = _TOOLS.get(sys.platform)
 if not platform_tools:
-    raise OSError(f"Piket currently does not support: {sys.platform}")
+    raise OSError(f"Piket currently does not support: {machine}")
 
 # resolve tool paths and expose them
 _TOOL_PATHS: dict[str, Path] = {}
 for tool, filename in platform_tools.items():
     try:
-        with resources.path("piket.bin", filename) as p:
+        with resources.path(f"piket.bin.{machine}", filename) as p:
             if not Path(p).exists():
                 raise FileNotFoundError(f"Missing required tool: {tool}")
             _TOOL_PATHS[tool] = p
@@ -29,12 +63,11 @@ for tool, filename in platform_tools.items():
 
 NEDCENC = _TOOL_PATHS["nedcenc"]
 NEVPK = _TOOL_PATHS["nevpk"]
-HEADERFIX = _TOOL_PATHS["headerfix"]
 
 # expose functions
 from .util import decode, encode, get_id
 
 __all__ = [
-    "NEDCENC", "NEVPK", "HEADERFIX", # tools
+    "NEDCENC", "NEVPK", # tools
     "decode", "encode", "get_id", # direct methods
 ]

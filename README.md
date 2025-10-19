@@ -44,5 +44,6 @@ For more detailed usage, check the dedicated [Usage Guide](https://github.com/pl
 - [Caitsith2](https://caitsith2.com/ereader/devtools.htm): Original e-Reader Tools (nedclib)
 - [Lymia](https://github.com/Lymia/nedclib): Cross-platform, open source version of Caitsith2's nedclib
 - [breadbored](https://github.com/breadbored/nedclib): Maintainer of Lymia's now-archived nedclib
+- [BlackShark](https://github.com/Bl4ckSh4rk): headerfix.c source code
 
 Nintendo is the copyright and trademark holder for Pikmin, its designs and its characters. This project is free, and for educational purposes only.

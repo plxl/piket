@@ -32,6 +32,9 @@ NEVPK = _TOOL_PATHS["nevpk"]
 HEADERFIX = _TOOL_PATHS["headerfix"]
 
 # expose functions
-from .util import decode, encode
+from .util import decode, encode, get_id
 
-__all__ = ["NEDCENC", "NEVPK", "HEADERFIX"]
+__all__ = [
+    "NEDCENC", "NEVPK", "HEADERFIX", # tools
+    "decode", "encode", "get_id", # direct methods
+]

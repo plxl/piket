@@ -6,7 +6,7 @@ from . import _to_bytes, _run_tool
 
 logger = logging.getLogger(__file__)
 
-def decode(data: bytes | bytearray | str | Path) -> bytearray:
+def decode(data: bytes | bytearray | str | Path, partial_decode: bool = False) -> bytearray:
     # handle all input types
     data = _to_bytes(data)
     file = NEDCENC.parent.resolve() / "in.raw"
@@ -29,6 +29,9 @@ def decode(data: bytes | bytearray | str | Path) -> bytearray:
     decoded = decoded_path.read_bytes()
     logger.debug(f"Removing '{decoded_path}'.")
     decoded_path.unlink()
+    
+    if partial_decode:
+        return bytearray(decoded)
 
     logger.debug("Trimming decoded .raw data to VPK block.")
     size = int.from_bytes(decoded[VPK_SIZE:VPK_SIZE+2], "little")

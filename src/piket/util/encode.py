@@ -1,8 +1,9 @@
 import logging
 from pathlib import Path
-from piket import NEDCENC, NEVPK, HEADERFIX
+from piket import NEDCENC, NEVPK
 from piket.constants import SIZE_INFO, VPK_SIZE, VPK
 from . import _to_bytes, _run_tool
+from .headerfix import headerfix
 
 logger = logging.getLogger(__file__)
 
@@ -71,23 +72,25 @@ def encode(
     decoded_path = PARENT / "decoded.bin"
     logger.debug(f"Writing rebuilt decoded data to '{decoded_path}'.")
     decoded_path.write_bytes(bytes(decoded))
+
+    decoded = decoded_path.read_bytes()
+    logger.debug(f"Removing '{decoded_path}'.")
+    decoded_path.unlink()
     
-    # run headerfix to fix the checksum
-    # note that headerfix writes the new file in-place
-    logger.debug("Running headerfix, output in-place at '{decoded_path}'.")
-    _run_tool(f'"{HEADERFIX}" "{decoded_path}"')
+    logger.debug("Running headerfix.")
+    fixed = headerfix(decoded)
 
     if partial_encode:
-        decoded = decoded_path.read_bytes()
-        logger.debug(f"Removing '{decoded_path}'.")
-        decoded_path.unlink()
-        return bytearray(decoded)
+        return bytearray(fixed)
+    
+    fixed_path = PARENT / "fixed.bin"
+    fixed_path.write_bytes(fixed)
 
     raw_path = PARENT / "card.raw"
     logger.debug(f"Running nedcenc, output to '{raw_path}'.")
-    _run_tool(f'"{NEDCENC}" -i "{decoded_path}" -e -o "{raw_path}"')
-    logger.debug(f"Removing '{decoded_path}'.")
-    decoded_path.unlink()
+    _run_tool(f'"{NEDCENC}" -i "{fixed_path}" -e -o "{raw_path}"')
+    logger.debug(f"Removing '{fixed_path}'.")
+    fixed_path.unlink()
     
     raw = raw_path.read_bytes()
     logger.debug(f"Removing '{raw_path}'.")

@@ -1,17 +1,16 @@
 # Piket: Pikmin e+ Card Tools
 All-in-one package for converting and managing Pikmin e+ Cards, pronounced "picket".
 
-Currently only ships with confirmed-working Windows binaries. Linux and macOS are on the way!
+Now with support for Windows, macOS (Apple Silicon), and Linux!
 
 ## Current Capabilities
 - Decode `.raw` to editable level data
 - Encode editable level data to `.raw`
 
 ### Future Plans
-- Go cross-platform with new binaries built from [plxl/nedclib](https://github.com/plxl/nedclib)
 - Introduce classes for in-house manipulation!
-  - `PikECard`: manipulate the primary card data
-  - `PikELevel`: manipulate individual level data (`set_camera`, `set_character`, `set_tile`, etc.)
+  - `Card`: manipulate the primary card data
+  - `Level`: manipulate individual level data (`set_camera`, `set_character`, `set_tile`, etc.)
 
 ## Installation
 Easily include Piket in your projects with `pip`:
@@ -20,7 +19,7 @@ pip install piket
 ```
 
 ## Demo
-Try Piket now with the **Converter Demo**!
+Try Piket now with the **Drag-and-Drop Converter**!
 ```
 python -m venv .venv
 .venv\Scripts\activate # or source .venv/bin/activate

@@ -28,8 +28,12 @@
 
           shellHook = ''
             echo "hiiieee !!!"
+
+            python3 -m venv .venv
             source .venv/bin/activate
-            echo "install with: \".venv/bin/pip install --no-build-isolation .\""
+            pip install --upgrade pip scikit-build-core setuptools wheel
+
+            echo install with: \"pip install --no-build-isolation .\"
           '';
         };
     };

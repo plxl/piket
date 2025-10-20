@@ -38,24 +38,28 @@ class Level(LevelBase):
         return super().to_bytes(raw)
 
     def get_tile(self, x: int, y: int) -> Tile:
+        """Gets the Tile at (x, y, layer 0)."""
         value = super().get_tile(x, y, 0)
         if value not in Tile._value2member_map_:
             raise ValueError(f"Unknown Tile with value {value}")
         return Tile(value)
     
     def get_object(self, x: int, y: int) -> Object:
+        """Gets the Object at (x, y, layer 1)."""
         value = super().get_tile(x, y, 1)
         if value not in Object._value2member_map_:
             raise ValueError(f"Unknown Object with value {value}")
         return Object(value)
 
     def get_piki(self, x: int, y: int) -> Piki:
+        """Gets the Piki at (x, y, layer 2)."""
         value = super().get_tile(x, y, 2)
         if value not in Piki._value2member_map_:
             raise ValueError(f"Unknown Piki with value {value}")
         return Piki(value)
 
     def set_tile(self, x: int, y: int, tile: Tile | Object | Piki):
+        """Sets the (Tile | Piki | Object) at (x, y) on the correct layer."""
         value = tile.value
         if isinstance(tile, Tile):
             layer = 0
@@ -63,12 +67,11 @@ class Level(LevelBase):
             layer = 1
         elif isinstance(tile, Piki):
             layer = 2
-        else:
-            raise ValueError(f"Type {self.__class__.__name__} does not have Layer {layer}.")
 
         super().set_tile(x, y, value, layer)
 
     def set_tiles(self, x: int, y: int, w: int, h: int, tile: Tile | Object | Piki):
+        """Sets the (Tiles | Objects | Pikis) from (x, y) to (w, h) on the correct layer."""
         value = tile.value
         if isinstance(tile, Tile):
             layer = 0
@@ -76,16 +79,16 @@ class Level(LevelBase):
             layer = 1
         elif isinstance(tile, Piki):
             layer = 2
-        else:
-            raise ValueError(f"Type {self.__class__.__name__} does not have Layer {layer}.")
 
         super().set_tiles(x, y, w, h, value, layer)
 
     def clear_all(self):
+        """Sets all Tiles, Objects and Pikis to value 0."""
         for i in range(self.layers):
             super().set_tiles(0, 0, self.width, self.height, 0, i)
     
     def set_grid(self, tile: Tile | Object | Piki):
+        """Sets the (Tiles | Objects | Pikis) from (0, 0) to (grid_w, grid_h) on the correct layer."""
         value = tile.value
         if isinstance(tile, Tile):
             layer = 0
@@ -93,7 +96,5 @@ class Level(LevelBase):
             layer = 1
         elif isinstance(tile, Piki):
             layer = 2
-        else:
-            raise ValueError(f"Type {self.__class__.__name__} does not have Layer {layer}.")
 
         super().set_tiles(0, 0, self.grid[0], self.grid[1], value, layer)

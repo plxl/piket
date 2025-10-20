@@ -13,11 +13,15 @@ class Card:
             self.decoded = decode(self.raw)
             self.id = get_id(self.raw).decode("ascii").replace('\x00', '')
 
-            if self.id == "PIKMINCARD1S":
+            if self.id == CARD_SET_A_PLUCKING or self.id == CARD_SET_D_OLIMAR:
                 # Plucking Pikmin x3
                 raise NotImplementedError(f"Card with ID {self.id} has not been implemented yet.")
 
-            elif self.id == "PIKMINCARD3S":
+            elif self.id == CARD_SET_B_MARCHING or self.id == CARD_SET_D_PRESIDENT:
+                # Marching Pikmin x3
+                raise NotImplementedError(f"Card with ID {self.id} has not been implemented yet.")
+
+            elif self.id == CARD_SET_C_CONNECTING or self.id == CARD_SET_D_LOUIE:
                 # Connecting Pikmin x3
                 for i in range(3):
                     start = i*0x100
@@ -25,6 +29,10 @@ class Card:
                     level_data = self.decoded[start:end]
                     level = ConnectingPikmin.Level.from_bytes(level_data)
                     self.levels.append(level)
+            
+            elif self.id == CARD_SETS_H_P_ALL:
+                # Promo card; 1x Plucking 1x Marching 1x Connecting
+                raise NotImplementedError(f"Card with ID {self.id} has not been implemented yet.")
 
             else:
                 raise ValueError(f"Card data contains an unrecognised ID: '{self.id}'.")

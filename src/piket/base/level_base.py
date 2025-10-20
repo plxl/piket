@@ -52,7 +52,7 @@ class LevelBase(ABC):
 
     @abstractmethod
     def to_bytes(self, raw: bytearray = bytearray()) -> bytes:
-        """Create a bytes object from this level data.
+        """Extends a bytes object with this level's tile layers.
 
         Returns:
             bytes: Level data as bytes.

@@ -37,22 +37,23 @@ class Level(LevelBase):
         raw.extend(self.grid)
         return super().to_bytes(raw)
 
-    def get_tile(self, x: int, y: int, layer: int) -> Tile | Object | Piki:
-        value = super().get_tile(x, y, layer)
-        try:
-            if layer == 0:
-                return Tile(value)
-            elif layer == 1:
-                return Object(value)
-            elif layer == 2:
-                return Piki(value)
-            else:
-                raise ValueError(f"Type {self.__class__.__name__} does not have Layer {layer}.")
+    def get_tile(self, x: int, y: int) -> Tile:
+        value = super().get_tile(x, y, 0)
+        if value not in Tile._value2member_map_:
+            raise ValueError(f"Unknown Tile with value {value}")
+        return Tile(value)
+    
+    def get_object(self, x: int, y: int) -> Object:
+        value = super().get_tile(x, y, 1)
+        if value not in Object._value2member_map_:
+            raise ValueError(f"Unknown Object with value {value}")
+        return Object(value)
 
-        except ValueError:
-            raise ValueError(
-                f"Unknown Tile with ID {value} on {self.__class__.__name__}.Layer {layer}."
-            )
+    def get_piki(self, x: int, y: int) -> Piki:
+        value = super().get_tile(x, y, 2)
+        if value not in Piki._value2member_map_:
+            raise ValueError(f"Unknown Piki with value {value}")
+        return Piki(value)
 
     def set_tile(self, x: int, y: int, tile: Tile | Object | Piki):
         value = tile.value

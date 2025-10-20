@@ -12,18 +12,18 @@ def encode(
     original: bytes | bytearray | str | Path,
     partial_encode: bool = False,
 ) -> bytearray:
+    PARENT = NEDCENC.parent.resolve()
+
     # handle all input types
     original = _to_bytes(original)
-    original_file = NEDCENC.parent.resolve() / "original.raw"
+    original_file = PARENT / "original.raw"
     logger.debug(f"Writing .raw original to '{original_file}'.")
     original_file.write_bytes(original)
 
     data = _to_bytes(data)
-    data_file = NEDCENC.parent.resolve() / "in.bin"
+    data_file = PARENT / "in.bin"
     logger.debug(f"Writing .bin data to '{data_file}'.")
     data_file.write_bytes(data)
-
-    PARENT = NEDCENC.parent.resolve()
 
     # decode original raw to use as template
     raw_decoded_path = PARENT / "raw_decoded.bin"

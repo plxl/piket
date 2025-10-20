@@ -9,7 +9,7 @@ _TOOLS = {
         "nedcenc": "nedcenc.exe",
         "nevpk": "nevpk.exe",
     },
-    "darwin": {
+    "macos": {
         "libnedclib": "libnedclib.dylib",
         "nedcenc": "nedcenc",
         "nevpk": "nevpk",
@@ -46,7 +46,8 @@ def get_machine():
 
 # validate platform os support
 machine = get_machine()
-platform_tools = _TOOLS.get(sys.platform)
+plat = machine[:machine.index("-")]
+platform_tools = _TOOLS.get(plat)
 if not platform_tools:
     raise OSError(f"Piket currently does not support: {machine}")
 

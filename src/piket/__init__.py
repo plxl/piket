@@ -67,6 +67,7 @@ NEVPK = _TOOL_PATHS["nevpk"]
 
 # expose functions
 from .util import decode, encode, get_id
+from .card import Card
 from . import connecting_pikmin as ConnectingPikmin
 
 __all__ = [

@@ -1,7 +1,13 @@
 from .tile import Tile
 from .object import Object
 from .piki import Piki
-from piket.constants import CONNECTING_PIKMIN_HEADER_LENGTH, CONNECTING_PIKMIN_LAYER_LENGTH
+from piket.constants import (
+    CONNECTING_PIKMIN_HEADER_LENGTH as HEADER_LEN,
+    CONNECTING_PIKMIN_LAYER_LENGTH as LAYER_LEN,
+    CONNECTING_WIDTH as WIDTH,
+    CONNECTING_HEIGHT as HEIGHT,
+    CONNECTING_LAYERS as LAYERS,
+)
 from piket.base.level_base import LevelBase
 from typing import Self
 
@@ -9,23 +15,23 @@ class Level(LevelBase):
     def __init__(
             self,
             index,
-            tiles:   bytearray = bytearray(9 * 6),
-            objects: bytearray = bytearray(9 * 6),
-            pikis:   bytearray = bytearray(9 * 6),
+            tiles:   bytearray = bytearray(WIDTH * HEIGHT),
+            objects: bytearray = bytearray(WIDTH * HEIGHT),
+            pikis:   bytearray = bytearray(WIDTH * HEIGHT),
             raw: bytes | bytearray = bytearray(0),
             grid: tuple[int, int] = (0, 0),
     ):
-        super().__init__(index, 9, 6, 3, [tiles, objects, pikis], raw)
+        super().__init__(index, WIDTH, HEIGHT, LAYERS, [tiles, objects, pikis], raw)
         self.grid = grid
 
     @classmethod
     def from_bytes(cls, level: bytearray) -> Self:
         index = level[0]
         grid = level[1], level[2]
-        layers = level[CONNECTING_PIKMIN_HEADER_LENGTH:]
-        tiles = layers[:CONNECTING_PIKMIN_LAYER_LENGTH]
-        objects = layers[CONNECTING_PIKMIN_LAYER_LENGTH:CONNECTING_PIKMIN_LAYER_LENGTH*2]
-        pikis = layers[CONNECTING_PIKMIN_LAYER_LENGTH*2:CONNECTING_PIKMIN_LAYER_LENGTH*3]
+        layers = level[HEADER_LEN:]
+        tiles = layers[:LAYER_LEN]
+        objects = layers[LAYER_LEN:LAYER_LEN*2]
+        pikis = layers[LAYER_LEN*2:LAYER_LEN*3]
         return cls(index, tiles, objects, pikis, level, grid)
 
     def to_bytes(self) -> bytes:

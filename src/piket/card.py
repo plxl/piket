@@ -23,7 +23,6 @@ class Card:
                     start = i*0x100
                     end = min((i+1)*0x100, len(self.decoded) - LEVEL_FOOTER_LENGTH)
                     level_data = self.decoded[start:end]
-                    print(level_data[0])
                     level = ConnectingPikmin.Level.from_bytes(level_data)
                     self.levels.append(level)
 

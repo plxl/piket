@@ -37,14 +37,17 @@ class Card:
             else:
                 raise ValueError(f"Card data contains an unrecognised ID: '{self.id}'.")
 
-    def encode(self) -> bytes:
+    def encode(self, partial_encode = False, raw_level = False) -> bytes:
         new_decoded = bytearray()
         for i, level in enumerate(self.levels):
             if isinstance(level, ConnectingPikmin.Level) and i < 2:
                 new_decoded.extend(level.to_bytes().ljust(0x100, b'\x00'))
+
             else:
                 new_decoded.extend(level.to_bytes())
         new_decoded.extend(self.decoded[-LEVEL_FOOTER_LENGTH:])
+        if raw_level: return new_decoded
 
-        self.raw = encode(new_decoded, self.raw)
-        return bytes(self.raw)
+        out = encode(new_decoded, self.raw, partial_encode)
+        if not partial_encode: self.raw = out
+        return bytes(out)

@@ -6,9 +6,10 @@ Now with support for Windows, macOS (Apple Silicon), and Linux!
 ## Current Capabilities
 - Decode `.raw` to editable level data
 - Encode editable level data to `.raw`
-- Built-in support for manipulating Plucking Pikmin and Connecting Pikmin levels, such as:
+- Built-in support for manipulating Plucking Pikmin, Connecting Pikmin, and Marching Pikmin levels, such as:
   - `set_tile` easily set a tile at (x, y), or `set_tiles` for (x, y, w, h) placement
   - `encode` to quickly and easily get your modified Card into raw format
+- Export and Import custom treasure sprites (both 16x16 and 32x32) for cards with Marching Pikmin levels
 
 ## Installation
 Easily include Piket in your projects with `pip`:

@@ -92,9 +92,10 @@ class Level(LevelBase):
         super().set_tiles(x, y, w, h, tile.value, 0)
 
     def clear_all(self):
-        """Sets all Tiles to value 0x60."""
+        """Sets all Tiles to value 0x60 and removes all Pikmin."""
         for i in range(self.layers):
             super().set_tiles(0, 0, self.width, self.height, 0x60, i)
+        self.clear_pikis()
 
     def clear_pikis(self):
         """Removes all Pikis currently in the level."""

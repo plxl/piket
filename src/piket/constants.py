@@ -10,9 +10,9 @@ CARD_SET_D_OLIMAR     = "PIKMINCARD1P" # D001 plucking
 CARD_SET_D_PRESIDENT  = "PIKMINCARD2P" # D002 marching
 CARD_SET_D_LOUIE      = "PIKMINCARD3P" # D003 connecting
 
-PLUCKING_PIKMIN   = "PIKMINPUZZLE01" .encode("ascii").ljust(16, b"\x00")
-MARCHING_PIKMIN   = "PIKMINOTAKARA"  .encode("ascii").ljust(16, b"\x00")
-CONNECTING_PIKMIN = "PIKMINPUZZLE02" .encode("ascii").ljust(16, b"\x00")
+PLUCKING_PIKMIN = "PIKMINPUZZLE01" .encode("ascii").ljust(16, b"\x00")
+MARCHING_PIKMIN = "PIKMINPUZZLE02" .encode("ascii").ljust(16, b"\x00")
+PIKMIN_OTAKARA  = "PIKMINOTAKARA"  .encode("ascii").ljust(16, b"\x00")
 
 LEVEL_ID_LENGTH = 0x10
 

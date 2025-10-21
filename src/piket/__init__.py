@@ -70,9 +70,10 @@ from .util import decode, encode, get_id
 from .card import Card
 from . import connecting_pikmin as ConnectingPikmin
 from . import plucking_pikmin as PluckingPikmin
+from . import marching_pikmin as MarchingPikmin
 
 __all__ = [
     "NEDCENC", "NEVPK", # tools
     "decode", "encode", "get_id", # direct methods
-    "ConnectingPikmin", "PluckingPikmin", # classes
+    "ConnectingPikmin", "PluckingPikmin", "MarchingPikmin", # classes
 ]

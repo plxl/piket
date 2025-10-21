@@ -10,6 +10,7 @@ This document will provide you with all the knowledge you need to take full adva
 - [Custom Treasures in Marching Pikmin](#custom-treasures-in-marching-pikmin)
   - [Export Treasure Data](#export-treasure-data)
   - [Editing Treasure Data](#editing-treasure-data)
+- [Download and Play](#download-and-play)
 
 ## Format Conversion
 Let's start with simple file format conversion:
@@ -212,3 +213,9 @@ This is the result of our custom treasure:
         <td><img src="demo_customtreasure_large.png" style="width:100%; height:auto; max-height:300px; object-fit:contain"></td>
     </tr>
 </table>
+
+## Download and Play
+
+All three levels demonstrated in this usage guide are available to download fully-packed and ready-to-play: [12-PLX1.raw](https://github.com/plxl/piket/raw/refs/heads/main/docs/12-PLX1.raw)
+
+This is a P-Set card, meaning it contains one level from each minigame. It also contains the custom treasure I sprited - "Fuel Reservoir" from Pikmin 2 - in its Marching Pikmin level.

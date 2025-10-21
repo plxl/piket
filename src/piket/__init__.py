@@ -55,7 +55,7 @@ if not platform_tools:
 _TOOL_PATHS: dict[str, Path] = {}
 for tool, filename in platform_tools.items():
     try:
-        with resources.path(f"piket.bin.{machine}", filename) as p:
+        with resources.path(f"piket.bin", filename) as p:
             if not Path(p).exists():
                 raise FileNotFoundError(f"Missing required tool: {tool}")
             _TOOL_PATHS[tool] = p

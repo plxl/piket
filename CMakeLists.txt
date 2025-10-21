@@ -19,15 +19,7 @@ set_target_properties(nedclib nedcenc nevpk PROPERTIES
   INSTALL_RPATH "$ORIGIN"
 )
 
-# use the folder name within packages "src/piket/bin" for now
-if(WIN32)
-  set(PLATFORM "windows-amd64")
-elseif(APPLE)
-  set(PLATFORM "macos-universal")
-else()
-  set(PLATFORM "linux-amd64")
-endif()
-set(_install_location piket/bin/${PLATFORM})
+set(_install_location piket/bin)
 
 # install binaries - build output: "piket/build/_deps/nedclib-build/"
 install(PROGRAMS

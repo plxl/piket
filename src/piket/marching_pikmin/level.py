@@ -42,7 +42,7 @@ class Level(LevelBase):
             x = pikis_bytes[i]
             y = pikis_bytes[i+1]
             # break if x,y = 0,0 (same as game)
-            if x == 0 and y == 0: break 
+            if x == 0 and y == 0: break
 
             piki_type = pikis_bytes[i+2]
             # skip if outside range (causes game crash)
@@ -51,7 +51,7 @@ class Level(LevelBase):
                     f"Marching Pikmin level data contains unrecognised Piki "
                     "type '{piki_type}'. This will be skipped to avoid game crashes."
                 )
-                continue 
+                continue
 
             pikis.append((x, y, piki_type))
 

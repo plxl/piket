@@ -22,18 +22,18 @@ class Level(LevelBase):
             pikis: list[tuple[int, int, int]] = [],
             raw: bytes | bytearray = bytearray(0),
             unk01: int = 0,
-            unk02: int = 0,
+            use_custom_treasure: bool = False,
     ):
         super().__init__(index, WIDTH, HEIGHT, 1, [tiles], raw)
         self.pikis = pikis
         self.unk01 = unk01
-        self.unk02 = unk02
+        self.use_custom_treasure = use_custom_treasure
 
     @classmethod
     def from_bytes(cls, level: bytearray) -> Self:
         index = level[0]
         unk01 = level[1]
-        unk02 = level[2]
+        use_custom_treasure = level[2] > 0
         layers = level[HEADER_LEN:]
         tiles = layers[:LAYER_LEN]
         pikis_bytes = layers[LAYER_LEN:LAYER_LEN+PIKIS_LEN]
@@ -55,14 +55,14 @@ class Level(LevelBase):
 
             pikis.append((x, y, piki_type))
 
-        return cls(index, tiles, pikis, level, unk01, unk02)
+        return cls(index, tiles, pikis, level, unk01, use_custom_treasure)
 
     def to_bytes(self) -> bytes:
         raw = bytearray()
         raw.extend(MARCHING_PIKMIN)
         raw.append(self.index)
         raw.append(self.unk01)
-        raw.append(self.unk02)
+        raw.append(0xFF if self.use_custom_treasure else 0)
         super().to_bytes(raw)
         for i in range(0, 0x3f, 3):
             if len(self.pikis) > i // 3:

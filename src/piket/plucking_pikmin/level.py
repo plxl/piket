@@ -10,7 +10,7 @@ from piket.constants import (
     PLUCKING_LAYERS as LAYERS,
 )
 from piket.base.level_base import LevelBase
-from typing import Self, overload
+from typing import Self
 
 class Level(LevelBase):
     def __init__(

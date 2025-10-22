@@ -7,9 +7,11 @@ This document will provide you with all the knowledge you need to take full adva
   - [Plucking Pikmin](#plucking-pikmin)
   - [Connecting Pikmin](#connecting-pikmin)
   - [Marching Pikmin](#marching-pikmin)
-- [Custom Treasures in Marching Pikmin](#custom-treasures-in-marching-pikmin)
-  - [Export Treasure Data](#export-treasure-data)
-  - [Editing Treasure Data](#editing-treasure-data)
+- [Treasures in Marching Pikmin](#treasures-in-marching-pikmin)
+  - [Prototype Detector](#prototype-detector)
+  - [Changing the Treasure](#changing-the-treasure)
+  - [Export Treasure Sprites](#export-treasure-sprites)
+  - [Custom Treasures](#custom-treasures)
 - [Download and Play](#download-and-play)
 
 ## Format Conversion
@@ -138,10 +140,41 @@ This is the result of our custom Marching Pikmin level:
 
 <img src="demo_marchingpikmin_customlevel.png" height="300px">
 
-## Custom Treasures in Marching Pikmin
-If you're feeling experimental you can try your hand at putting your very own custom treasure sprite into the card's data! I've written the `TreasureSprite` class to be very versatile, so there are several different ways you could do this.
+## Treasures in Marching Pikmin
+Most Marching Pikmin levels use the Rubber Ugly as its collectible treasure, which is a treasure sprite built into the game's ROM - not the card. However, some levels have other treasures like the Tear Stone and Science Project - those sprites are actually ***stored on the cards***, which means we can overwrite that data with our own custom treasure sprites. Unfortunately, you can only store one treasure (two sprites, small and large) on one card.
 
-### Export Treasure Data
+
+
+### Prototype Detector
+Since the treasure sprites themselves are Nintendo's intellectual property, I cannot distribute them. As such, to use vanilla sprites like the Tear Stone, you'll need a folder on your computer with all the raw card files in it. Once you have that, **Prototype Detector** can be used to prepare Piket with those sprites.
+
+After installing Piket, run this and follow the prompts: `python -m piket.pd`
+
+### Changing the Treasure
+Without making your own treasure sprites, you can currently use all 10 vanilla sprites (after running Prototype Detector), or my very own ***custom*** treasure; the Fuel Reservoir! Custom treasures don't require all the original card files, as they are shipped with Piket.
+
+```py
+from piket import Card, Treasure, MarchingPikmin as M
+from pathlib import Path
+
+card = Card("12-B001.raw")
+
+# use vanilla treasure
+# this will raise an exception if you have not initialised with Prototype Detector
+card.set_treasure(Treasure.TEAR_STONE)
+
+# use my custom treasure
+# will not raise an exception
+card.set_treasure(Treasure.FUEL_RESERVOIR)
+
+if isinstance(card.levels[0], M.Level):
+    card.levels[0].use_custom_treasure = True # tells the game not to use the Rubber Ugly
+
+Path("12-B001-CustomTreasure.raw").write_bytes(card)
+```
+
+### Export Treasure Sprites
+Piket has built-in support for exporting card's treasure sprites as PNGs, as well as the raw palette data allowing you to easily modify and create your own treasures (more on that in the next section).
 ```py
 from piket import Card, MarchingPikmin as M
 from pathlib import Path
@@ -152,35 +185,42 @@ if card.treasure:
     card.treasure.export_palette("palette.pal") # extracts palette data and writes to file
     card.treasure.export_small("small.png") # exports the small 16x16 treasure sprite
     card.treasure.export_large("large.png") # exports the large 32x32 treasure sprite
-
-    # you can even just export the full image block data
-    # to be used directly in tools like YY-CHR:
-    Path("sprites.bin").write_bytes(card.treasure.sprites)
-    # if you follow this method, also export palette with
-    # the same stem ("sprites") so YY-CHR auto-loads it:
-    card.treasure.export_palette("sprites.pal")
 ```
-### Editing Treasure Data
-There are numerous ways you could go about modifying the treasure sprites, but I'd recommend you use [YY-CHR (.NET version)](https://www.smwcentral.net/?p=section&a=details&id=27208). We'll go over how to do that here:
+### Custom Treasures
+There are numerous ways you could go about modifying the treasure sprites, but for this guide we'll use [YY-CHR (.NET version)](https://www.smwcentral.net/?p=section&a=details&id=27208) (for Windows, but should work on Linux through Wine).
 
-1. Launch `YYCHR.exe`.
-2. Drag-and-drop exported `sprites.bin` onto YYCHR. It should automatically load `sprites.pal`. It will likely look corrupted, we'll fix that now.
-3. Set `Format` to `4BPP GBA`.
-4. Next to `Pattern`, click `Edit`, create a new pattern, and set it to match mine in the turquoise box:
+1. Extract existing treasure data from a card (easiest workflow):
+    ```py
+    from piket import Card, MarchingPikmin as M
+    from pathlib import Path
+
+    card = Card("12-B001.raw")
+
+    if card.treasure:
+        # export the raw sprites data to be used in YY-CHR
+        Path("sprites.bin").write_bytes(card.treasure.sprites)
+        # export accompanying palette, use the same name as sprites data
+        card.treasure.export_palette("sprites.pal")
+    ```
+
+2. Launch `YYCHR.exe`.
+3. Drag-and-drop exported `sprites.bin` onto YYCHR. It should automatically load `sprites.pal`. It will likely look corrupted, we'll fix that now.
+4. Set `Format` to `4BPP GBA`.
+5. Next to `Pattern`, click `Edit`, create a new pattern, and set it to match mine in the turquoise box:
 
     <img src="yychr_patterneditor.png" height="200px">
     <img src="yychr_patterneditor_crop.png" height="200px">
 
-5. Give the new pattern a name and click `Update` to add it. Close the Pattern Editor and select the new pattern from the list.
-6. Edit the sprites and palette to your liking.
+6. Give the new pattern a name and click `Update` to add it. Close the Pattern Editor and select the new pattern from the list.
+7. Edit the sprites and palette to your liking.
     - IMPORTANT: You only get to use that first row of colours in the palette editor (0x0 -> 0xF).
     - The left-most (0x00) colour will be rendered transparent in-game.
 
     <img src="yychr_sprites.png" height="300px">
 
-7. `File` -> `Save`. Press `No` when prompted to change size. We want to keep the data structure exactly the same as it was originally. If you press Yes, you won't be able to undo it.
-8. `Palette` -> `Save RGB Palette (*.pal)...`. Feel free to overwrite the original `sprites.pal`.
-9. Now we can load it into our new card!
+8. `File` -> `Save`. Press `No` when prompted to change size. We want to keep the data structure exactly the same as it was originally. If you press Yes, you won't be able to undo it.
+9. `Palette` -> `Save RGB Palette (*.pal)...`. Feel free to overwrite the original `sprites.pal`.
+10. Now we can load it into our new card!
     ```py
     from piket import Card, MarchingPikmin as M
     from pathlib import Path
@@ -201,6 +241,7 @@ There are numerous ways you could go about modifying the treasure sprites, but I
 
     Path("12-B001-New.raw").write_bytes(card.encode())
     ```
+
 This is the result of our custom treasure:
 
 <table style="width:100%;">

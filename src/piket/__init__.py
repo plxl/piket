@@ -65,9 +65,10 @@ for tool, filename in platform_tools.items():
 NEDCENC = _TOOL_PATHS["nedcenc"]
 NEVPK = _TOOL_PATHS["nevpk"]
 
-# expose functions
+# expose methods and classes
 from .util import decode, encode, get_id
 from .card import Card
+from .treasure import Treasure
 from . import connecting_pikmin as ConnectingPikmin
 from . import plucking_pikmin as PluckingPikmin
 from . import marching_pikmin as MarchingPikmin
@@ -75,5 +76,6 @@ from . import marching_pikmin as MarchingPikmin
 __all__ = [
     "NEDCENC", "NEVPK", # tools
     "decode", "encode", "get_id", # direct methods
-    "Card", "ConnectingPikmin", "PluckingPikmin", "MarchingPikmin", # classes
+    "Card", "Treasure", # primary classes
+    "ConnectingPikmin", "PluckingPikmin", "MarchingPikmin", # level classes
 ]

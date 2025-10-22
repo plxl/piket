@@ -1,14 +1,14 @@
 from pathlib import Path
-from piket.util import _to_bytes, decode, encode, get_id
-from piket.constants import *
+from .util import _to_bytes, decode, encode, get_id
+from .constants import *
 from pathlib import Path
 from . import (
     plucking_pikmin as P,
     connecting_pikmin as C,
     marching_pikmin as M,
 )
-from piket.base.level_base import LevelBase
-from .marching_pikmin.treasure import TreasureSprite
+from .base.level_base import LevelBase
+from .treasure import Treasure, TreasureSprite
 import logging
 
 logger = logging.getLogger(__file__)

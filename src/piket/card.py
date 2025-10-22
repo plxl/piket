@@ -123,6 +123,13 @@ class Card:
 
         return False
 
+    def set_treasure(self, treasure: Treasure):
+        """Sets the treasure binary data automatically.
+        IMPORTANT: This only works if you have already extracted your treasure sprites
+        using the Prototype Detector. Run `python -m piket.pd` to confirm.
+        """
+        self.treasure = TreasureSprite.from_bytes(treasure.data)
+
     def encode(self, partial_encode = False, raw_level = False) -> bytes:
         new_decoded = bytearray()
         for i, level in enumerate(self.levels):

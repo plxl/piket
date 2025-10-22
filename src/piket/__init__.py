@@ -75,5 +75,5 @@ from . import marching_pikmin as MarchingPikmin
 __all__ = [
     "NEDCENC", "NEVPK", # tools
     "decode", "encode", "get_id", # direct methods
-    "ConnectingPikmin", "PluckingPikmin", "MarchingPikmin", # classes
+    "Card", "ConnectingPikmin", "PluckingPikmin", "MarchingPikmin", # classes
 ]

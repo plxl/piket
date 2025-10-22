@@ -5,20 +5,20 @@ from pathlib import Path
 
 _TOOLS = {
     "windows": {
-        "libnedclib": "libnedclib.dll",
-        "nedcenc": "nedcenc.exe",
-        "nevpk": "nevpk.exe",
+        "libnedclib": ["libnedclib.dll", "nedclib.dll"],
+        "nedcenc": ["nedcenc.exe"],
+        "nevpk": ["nevpk.exe"],
     },
     "macos": {
-        "libnedclib": "libnedclib.dylib",
-        "nedcenc": "nedcenc",
-        "nevpk": "nevpk",
+        "libnedclib": ["libnedclib.dylib"],
+        "nedcenc": ["nedcenc"],
+        "nevpk": ["nevpk"],
     },
     "linux": {
-        "libnedclib": "libnedclib.so",
-        "nedcenc": "nedcenc",
-        "nevpk": "nevpk",
-    }
+        "libnedclib": ["libnedclib.so"],
+        "nedcenc": ["nedcenc"],
+        "nevpk": ["nevpk"],
+    },
 }
 
 def get_machine():
@@ -53,14 +53,16 @@ if not platform_tools:
 
 # resolve tool paths and expose them
 _TOOL_PATHS: dict[str, Path] = {}
-for tool, filename in platform_tools.items():
-    try:
-        with resources.path(f"piket.bin", filename) as p:
-            if not Path(p).exists():
-                raise FileNotFoundError(f"Missing required tool: {tool}")
-            _TOOL_PATHS[tool] = p
-    except Exception as e:
-        raise ImportError(f"Error loading binary '{filename}': {e}")
+for tool, filenames in platform_tools.items():
+    for filename in filenames:
+        try:
+            with resources.path(f"piket.bin", filename) as p:
+                if Path(p).exists():
+                    _TOOL_PATHS[tool] = p
+        except Exception as e:
+            raise ImportError(f"Error loading binary '{filename}': {e}")
+    if tool not in _TOOL_PATHS:
+        raise FileNotFoundError(f"Missing required tool: {tool}")
 
 NEDCENC = _TOOL_PATHS["nedcenc"]
 NEVPK = _TOOL_PATHS["nevpk"]

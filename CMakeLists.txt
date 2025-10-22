@@ -9,7 +9,7 @@ include(FetchContent)
 FetchContent_Declare(
   nedclib
   GIT_REPOSITORY https://github.com/plxl/nedclib.git
-  GIT_TAG c239fd918af49594c080075769fd5cb3c5d0ba85
+  GIT_TAG master # TODO: pin this
 )
 FetchContent_MakeAvailable(nedclib)
 
@@ -21,15 +21,8 @@ set_target_properties(nedclib nedcenc nevpk PROPERTIES
 
 set(_install_location piket/bin)
 
-# install binaries - build output: "piket/build/_deps/nedclib-build/"
-install(PROGRAMS
-    "${nedclib_BINARY_DIR}/nedcenc"
-    "${nedclib_BINARY_DIR}/nevpk"
-    DESTINATION ${_install_location}
-)
-
-# install libraries - build output: "piket/build/"
-install(TARGETS nedclib
+# install stuff
+install(TARGETS nedclib nedcenc nevpk
     LIBRARY DESTINATION ${_install_location}
     RUNTIME DESTINATION ${_install_location}
 )

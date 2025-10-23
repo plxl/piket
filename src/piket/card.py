@@ -15,15 +15,30 @@ logger = logging.getLogger(__file__)
 
 class Card:
     def __init__(self, card: bytes | bytearray | str | Path | None):
+        """Creates a new Card object from .raw bytes."""
         self.levels: list[LevelBase] = []
         self.treasure: TreasureSprite | None = None
         if card is not None:
             self.raw = _to_bytes(card)
             self.decoded = decode(self.raw)
+
+            # check footer offset
+            # only applies to any card that isn't 3x Connecting Pikmin, since
+            # they skip the initial 0x100 padding
+            if self.decoded[0] == 0xC3:
+                # only nintendo and God knows why the offset is +0x100
+                footer_offset = int.from_bytes(self.decoded[1:3], 'little') - 0x100
+                if len(self.decoded) != footer_offset + 5:
+                    raise ValueError(
+                        f"Decoded+decompressed card contained a footer offset that did not match. "
+                        f"Expected length {hex(footer_offset+5)}, got {hex(len(self.decoded))}."
+                    )
+
             self.id = get_id(self.raw).decode("ascii").replace('\x00', '')
 
             if self.id == CARD_SET_A_PLUCKING or self.id == CARD_SET_D_OLIMAR:
-                """Set-A cards and also Set-D001/Olimar. Contains:
+                """
+                Set-A cards and also Set-D001/Olimar. Contains:
                 - 3 x Plucking
                 """
                 start = LEVELS_START + LEVEL_ID_LENGTH
@@ -36,7 +51,8 @@ class Card:
                     start += FULL_LEVEL
 
             elif self.id == CARD_SET_B_MARCHING or self.id == CARD_SET_D_PRESIDENT:
-                """Set-B cards and also Set-D002/President. Contains:
+                """
+                Set-B cards and also Set-D002/President. Contains:
                 - 3 x Marching
                 """
                 start = LEVELS_START * 2 + LEVEL_ID_LENGTH
@@ -49,7 +65,8 @@ class Card:
                     start += FULL_LEVEL
 
             elif self.id == CARD_SET_C_CONNECTING or self.id == CARD_SET_D_LOUIE:
-                """Set-C cards and also Set-D003/Louie. Contains:
+                """
+                Set-C cards and also Set-D003/Louie. Contains:
                 - 3 x Connecting
                 """
                 for i in range(3):
@@ -60,7 +77,8 @@ class Card:
                     self.levels.append(level)
 
             elif self.id == CARD_SETS_H_P_ALL:
-                """Promotional cards [H001 -> H006] + [P001 -> P003]. Contains:
+                """
+                Promotional cards [H001 -> H006] + [P001 -> P003]. Contains:
                 - 1 x Plucking
                 - 1 x Marching
                 - 1 x Connecting

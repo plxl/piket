@@ -25,11 +25,6 @@ def encode(
         logger.debug(f"Writing .raw original to '{original_file}'.")
         original_file.write_bytes(original)
 
-        data = _to_bytes(data)
-        data_file = PARENT / "in.bin"
-        logger.debug(f"Writing .bin data to '{data_file}'.")
-        data_file.write_bytes(data)
-
         # decode original raw to use as template
         raw_decoded_path = PARENT / "raw_decoded.bin"
         logger.debug(f"Running nedcenc, output to '{raw_decoded_path}'.")
@@ -42,6 +37,11 @@ def encode(
         decoded = bytearray(raw_decoded_path.read_bytes())
         logger.debug(f"Removing '{raw_decoded_path}'.")
         raw_decoded_path.unlink()
+
+    data = _to_bytes(data)
+    data_file = PARENT / "in.bin"
+    logger.debug(f"Writing .bin data to '{data_file}'.")
+    data_file.write_bytes(data)
 
     # compress new data with nevpk
     compressed_path = PARENT / "trimmed.vpk"

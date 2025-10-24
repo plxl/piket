@@ -16,27 +16,32 @@ def encode(
 
     # handle all input types
     original = _to_bytes(original)
-    original_file = PARENT / "original.raw"
-    logger.debug(f"Writing .raw original to '{original_file}'.")
-    original_file.write_bytes(original)
+    
+    if len(original) > 0xA+8 and original[0x1A:0x1A + 8] == b"NINTENDO":
+        decoded = bytearray(original)
 
-    data = _to_bytes(data)
-    data_file = PARENT / "in.bin"
-    logger.debug(f"Writing .bin data to '{data_file}'.")
-    data_file.write_bytes(data)
+    else:
+        original_file = PARENT / "original.raw"
+        logger.debug(f"Writing .raw original to '{original_file}'.")
+        original_file.write_bytes(original)
 
-    # decode original raw to use as template
-    raw_decoded_path = PARENT / "raw_decoded.bin"
-    logger.debug(f"Running nedcenc, output to '{raw_decoded_path}'.")
-    _run_tool(f'"{NEDCENC}" -i "{original_file}" -d -o "{raw_decoded_path}"')
-    if not raw_decoded_path.exists():
-        raise Exception("nedcenc did not output a file.")
-    logger.debug(f"Removing '{original_file}'.")
-    original_file.unlink()
+        data = _to_bytes(data)
+        data_file = PARENT / "in.bin"
+        logger.debug(f"Writing .bin data to '{data_file}'.")
+        data_file.write_bytes(data)
 
-    decoded = bytearray(raw_decoded_path.read_bytes())
-    logger.debug(f"Removing '{raw_decoded_path}'.")
-    raw_decoded_path.unlink()
+        # decode original raw to use as template
+        raw_decoded_path = PARENT / "raw_decoded.bin"
+        logger.debug(f"Running nedcenc, output to '{raw_decoded_path}'.")
+        _run_tool(f'"{NEDCENC}" -i "{original_file}" -d -o "{raw_decoded_path}"')
+        if not raw_decoded_path.exists():
+            raise Exception("nedcenc did not output a file.")
+        logger.debug(f"Removing '{original_file}'.")
+        original_file.unlink()
+
+        decoded = bytearray(raw_decoded_path.read_bytes())
+        logger.debug(f"Removing '{raw_decoded_path}'.")
+        raw_decoded_path.unlink()
 
     # compress new data with nevpk
     compressed_path = PARENT / "trimmed.vpk"

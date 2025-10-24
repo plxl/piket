@@ -1,5 +1,5 @@
 from pathlib import Path
-from .util import _to_bytes, decode, encode, get_id
+from .util import _to_bytes, decode, decompress, encode
 from .constants import *
 from pathlib import Path
 from . import (
@@ -14,27 +14,61 @@ import logging
 logger = logging.getLogger(__file__)
 
 class Card:
+    
+    levels: list[LevelBase]
+    treasure: TreasureSprite | None
+    raw: bytes
+    decoded: bytes
+    leveldata: bytes
+    footer: bytes
+    id: str
+    
     def __init__(self, card: bytes | bytearray | str | Path | None):
         """Creates a new Card object from .raw bytes."""
         self.levels: list[LevelBase] = []
         self.treasure: TreasureSprite | None = None
-        if card is not None:
-            self.raw = _to_bytes(card)
-            self.decoded = decode(self.raw)
+        if card is None:
+            self.footer = FOOTER_NORMAL
+
+        else:
+            in_bytes = _to_bytes(card)
+            in_footer = in_bytes[-5:]
+            # determine type of input bytes (card.raw, card_decoded.bin, card_decompressed.bin)
+            if in_footer == FOOTER_NORMAL or in_footer == FOOTER_CONNECTING_X3:
+                # in bytes are decompressed level data
+                # unfortunately we will have to infer a level ID based on contents
+                self.leveldata = in_bytes
+                raise NotImplementedError(
+                    "Automatic inference of ID based on level data contents alone "
+                    "has not been implemented yet.")
+
+            elif in_bytes[0x1A:0x1A + 8] == b"NINTENDO":
+                # in bytes are decoded card data which needs to be decompressed
+                self.decoded = in_bytes
+                self.leveldata = decompress(in_bytes)
+
+            else:
+                # raw card file
+                self.raw = in_bytes
+                self.decoded = decode(in_bytes, partial_decode=True)
+                self.leveldata = decompress(self.decoded)
+
+            if self.decoded:
+                self.id = self.decoded[-16:].decode("ascii").replace("\x00", "")
+
+            self.footer = self.leveldata[-5:]
 
             # check footer offset
             # only applies to any card that isn't 3x Connecting Pikmin, since
             # they skip the initial 0x100 padding
-            if self.decoded[0] == 0xC3:
+            if self.leveldata[0] == 0xC3:
                 # only nintendo and God knows why the offset is +0x100
-                footer_offset = int.from_bytes(self.decoded[1:3], 'little') - 0x100
-                if len(self.decoded) != footer_offset + 5:
+                footer_offset = int.from_bytes(self.leveldata[1:3], 'little') - 0x100
+                if len(self.leveldata) != footer_offset + 5:
                     raise ValueError(
                         f"Decoded+decompressed card contained a footer offset that did not match. "
-                        f"Expected length {hex(footer_offset+5)}, got {hex(len(self.decoded))}."
+                        f"Expected length {hex(footer_offset+5)}, got {hex(len(self.leveldata))}."
                     )
-
-            self.id = get_id(self.raw).decode("ascii").replace('\x00', '')
 
             if self.id == CARD_SET_A_PLUCKING or self.id == CARD_SET_D_OLIMAR:
                 """
@@ -44,8 +78,8 @@ class Card:
                 start = LEVELS_START + LEVEL_ID_LENGTH
                 FULL_LEVEL = LEVEL_ID_LENGTH + PLUCKING_PIKMIN_LENGTH
                 for i in range(3):
-                    end = min(start + FULL_LEVEL, len(self.decoded) - LEVEL_FOOTER_LENGTH)
-                    level_data = self.decoded[start:end]
+                    end = min(start + FULL_LEVEL, len(self.leveldata) - LEVEL_FOOTER_LENGTH)
+                    level_data = self.leveldata[start:end]
                     level = P.Level.from_bytes(level_data)
                     self.levels.append(level)
                     start += FULL_LEVEL
@@ -59,7 +93,7 @@ class Card:
                 FULL_LEVEL = LEVEL_ID_LENGTH + MARCHING_PIKMIN_LENGTH
                 for i in range(3):
                     end = start + FULL_LEVEL
-                    level_data = self.decoded[start:end]
+                    level_data = self.leveldata[start:end]
                     level = M.Level.from_bytes(level_data)
                     self.levels.append(level)
                     start += FULL_LEVEL
@@ -71,8 +105,8 @@ class Card:
                 """
                 for i in range(3):
                     start = i*0x100
-                    end = min((i+1)*0x100, len(self.decoded) - LEVEL_FOOTER_LENGTH)
-                    level_data = self.decoded[start:end]
+                    end = min((i+1)*0x100, len(self.leveldata) - LEVEL_FOOTER_LENGTH)
+                    level_data = self.leveldata[start:end]
                     level = C.Level.from_bytes(level_data)
                     self.levels.append(level)
 
@@ -85,19 +119,19 @@ class Card:
                 """
                 start = LEVELS_START + LEVEL_ID_LENGTH
                 end = 0x200
-                level_data = self.decoded[start:end]
+                level_data = self.leveldata[start:end]
                 level = P.Level.from_bytes(level_data)
                 self.levels.append(level)
                 # Marching Pikmin
                 start = 0x200 + LEVEL_ID_LENGTH
                 end = 0x400
-                level_data = self.decoded[start:end]
+                level_data = self.leveldata[start:end]
                 level = M.Level.from_bytes(level_data)
                 self.levels.append(level)
                 # Connecting Pikmin
                 start = 0x400
-                end = len(self.decoded) - LEVEL_FOOTER_LENGTH
-                level_data = self.decoded[start:end]
+                end = len(self.leveldata) - LEVEL_FOOTER_LENGTH
+                level_data = self.leveldata[start:end]
                 level = C.Level.from_bytes(level_data)
                 self.levels.append(level)
 
@@ -113,14 +147,15 @@ class Card:
         Returns:
             bool: True if succeeds, False if there is no data to decode.
         """
-        if not self.decoded:
-            raise Exception("Unable to decode treasures without a decoded binary.")
+        if not self.leveldata:
+            raise Exception("Unable to decode treasures without decoded and "
+                            "decompressed level data.")
 
         # make sure the block at least big enough to validate header
-        if len(self.decoded) > 0x790:
-            data = self.decoded[0x780:]
+        if len(self.leveldata) > 0x790:
+            data = self.leveldata[0x780:]
             # make sure the block starts with PIKMINOTAKARA header
-            if self.decoded[0x780:0x790] == PIKMIN_OTAKARA:
+            if self.leveldata[0x780:0x790] == PIKMIN_OTAKARA:
                 self.treasure = TreasureSprite.from_bytes(data)
                 return True
 
@@ -149,7 +184,7 @@ class Card:
         self.treasure = TreasureSprite.from_bytes(treasure.data)
 
     def encode(self, partial_encode = False, raw_level = False) -> bytes:
-        new_decoded = bytearray()
+        new_leveldata = bytearray()
         for i, level in enumerate(self.levels):
             if i > 2:
                 raise ValueError(
@@ -159,11 +194,11 @@ class Card:
             if i == 0:
                 if isinstance(level, P.Level):
                     # always 0x100 padding before first Plucking Pikmin level
-                    new_decoded.extend(self.decoded[:0x100])
+                    new_leveldata.extend(self.leveldata[:0x100])
 
                 elif isinstance(level, M.Level):
                     # always 0x200 padding before first Marching Pikmin level
-                    new_decoded.extend(self.decoded[:0x200])
+                    new_leveldata.extend(self.leveldata[:0x200])
 
             level_bytes = level.to_bytes()
 
@@ -207,22 +242,29 @@ class Card:
             if padding > 0: level_bytes = level_bytes.ljust(padding, b"\x00")
 
             # add level bytes
-            new_decoded.extend(level_bytes)
+            new_leveldata.extend(level_bytes)
 
         # add PIKMINOTAKARA treasure data if necessary
         if self.treasure:
             # always pad to 0x780 for treasure data
-            new_decoded = new_decoded.ljust(0x780, b"\x00")
-            new_decoded.extend(self.treasure.encode())
+            new_leveldata = new_leveldata.ljust(0x780, b"\x00")
+            new_leveldata.extend(self.treasure.encode())
 
         # add footer
-        new_decoded.extend(self.decoded[-LEVEL_FOOTER_LENGTH:])
+        new_leveldata.extend(self.footer)
 
         # return early if user wants raw level data bytes
-        if raw_level: return new_decoded
+        if raw_level:
+            return bytes(new_leveldata)
 
-        # encode the level data either fully or partially
-        out = encode(new_decoded, self.raw, partial_encode)
+        # rebuild raw from existing decoded data
+        elif self.decoded:
+            out = encode(new_leveldata, self.decoded, partial_encode)
+
+        else:
+            # reconstruct raw data from inferred data
+            raise NotImplementedError(
+                "Automatic decoded data construction from just level data is incomplete.")
 
         # only update self.raw if it was a full encode
         if not partial_encode: self.raw = out

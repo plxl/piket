@@ -25,7 +25,8 @@ class Level(LevelBase):
         self.grid = grid
 
     @classmethod
-    def from_bytes(cls, level: bytearray) -> Self:
+    def from_bytes(cls, level: bytes | bytearray) -> Self:
+        level = bytearray(level)
         index = level[0]
         grid = level[1], level[2]
         layers = level[HEADER_LEN:]

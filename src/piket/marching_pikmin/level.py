@@ -30,7 +30,8 @@ class Level(LevelBase):
         self.use_custom_treasure = use_custom_treasure
 
     @classmethod
-    def from_bytes(cls, level: bytearray) -> Self:
+    def from_bytes(cls, level: bytes | bytearray) -> Self:
+        level = bytearray(level)
         index = level[0]
         unk01 = level[1]
         use_custom_treasure = level[2] > 0

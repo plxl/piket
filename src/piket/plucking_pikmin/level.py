@@ -29,7 +29,8 @@ class Level(LevelBase):
         self.player = player
 
     @classmethod
-    def from_bytes(cls, level: bytearray) -> Self:
+    def from_bytes(cls, level: bytes | bytearray) -> Self:
+        level = bytearray(level)
         index = level[0]
         grid = level[1], level[2]
         start = level[3] % WIDTH, level[4] % HEIGHT

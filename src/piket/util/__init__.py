@@ -33,8 +33,8 @@ def _run_tool(command: str):
         raise subprocess.CalledProcessError(result.returncode, command)
 
 # expose methods directly
-from .decode import decode
+from .decode import decode, decompress
 from .encode import encode
 from .get_id import get_id
 
-__all__ = ["decode", "encode", "get_id"]
+__all__ = ["decode", "decompress", "encode", "get_id"]

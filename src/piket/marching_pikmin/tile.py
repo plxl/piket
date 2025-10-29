@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class Tile(Enum):
     GROUND = 0
     FIRE = 0x10

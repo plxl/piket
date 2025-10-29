@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class Tile(Enum):
     ALL = 0
     HORIZONTAL = 1

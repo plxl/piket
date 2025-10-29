@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class Object(Enum):
     NONE = 0
     FIRE = 1

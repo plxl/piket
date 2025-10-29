@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Self
 
+
 class LevelBase(ABC):
     """Abstract base class for all level types."""
 
@@ -19,7 +20,7 @@ class LevelBase(ABC):
         layers: int = 2,
         tiles: list[bytearray] | None = None,
         raw: bytes = bytes(0),
-):
+    ):
         """Initialise a level with width, height, and layered tiles.
 
         Args:
@@ -39,19 +40,18 @@ class LevelBase(ABC):
 
     @classmethod
     @abstractmethod
-    def from_bytes(cls, data: bytes | bytearray) -> Self:
+    def from_bytes(cls, level: bytes | bytearray) -> Self:
         """Create a level from decoded level data bytes.
 
         Args:
-            data (bytes | bytearray): Decoded level data bytes
+            level (bytes | bytearray): Decoded level data bytes
 
         Returns:
             LevelBase: A new level instance.
         """
         pass
 
-    @abstractmethod
-    def to_bytes(self, raw: bytearray = bytearray()) -> bytes:
+    def _to_bytes(self, raw: bytearray = bytearray()) -> bytes:
         """Extends a bytes object with this level's tile layers.
 
         Returns:
@@ -61,8 +61,7 @@ class LevelBase(ABC):
             raw.extend(self.tiles[i])
         return raw
 
-    @abstractmethod
-    def get_tile(self, x: int, y: int, layer: int) -> int:
+    def _get_tile(self, x: int, y: int, layer: int) -> int:
         """Gets the tile at (x, y, layer).
 
         Returns:
@@ -74,14 +73,13 @@ class LevelBase(ABC):
             raise IndexError(f"Invalid position ({x}, {y})")
         return self.tiles[layer][y * self.width + x]
 
-    @abstractmethod
-    def set_tile(self, x: int, y: int, tile: int, layer: int):
+    def _set_tile(self, x: int, y: int, tile: int, layer: int):
         """Sets the tile at (x, y, layer) to an int value."""
         self.tiles[layer][y * self.width + x] = tile
 
-    @abstractmethod
-    def set_tiles(self, x: int, y: int, w: int, h: int, tile: int, layer: int):
+    def _set_tiles(self, x: int, y: int, w: int, h: int, tile: int, layer: int):
         """Sets the tiles at (x, y, w, h, layer) to an int value."""
-        for ix in range(x, x+w):
-            for iy in range(y, y+h):
-                LevelBase.set_tile(self, ix, iy, tile, layer)
+        for ix in range(x, x + w):
+            for iy in range(y, y + h):
+                # * must use LevelBase._set_tile() because self may not be a LevelBase
+                LevelBase._set_tile(self, ix, iy, tile, layer)

@@ -1,6 +1,7 @@
 from enum import Enum
 from pathlib import Path
 
+
 class Treasure(Enum):
     TEAR_STONE            = "ティア・ストーン"
     PINK_MENACE           = "オーバーキル・レッド"

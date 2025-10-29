@@ -6,7 +6,7 @@ from piket.constants import (
     MARCHING_PIKMIN_LAYER_LENGTH as LAYER_LEN,
     MARCHING_WIDTH as WIDTH,
     MARCHING_HEIGHT as HEIGHT,
-    MARCHING_PIKIS_LENGTH as PIKIS_LEN
+    MARCHING_PIKIS_LENGTH as PIKIS_LEN,
 )
 from piket.base.level_base import LevelBase
 from typing import Self
@@ -14,15 +14,16 @@ import logging
 
 logger = logging.getLogger(__file__)
 
+
 class Level(LevelBase):
     def __init__(
-            self,
-            index,
-            tiles: bytearray = bytearray(WIDTH * HEIGHT),
-            pikis: list[tuple[int, int, int]] = [],
-            raw: bytes | bytearray = bytearray(0),
-            unk01: int = 0,
-            use_custom_treasure: bool = False,
+        self,
+        index: int,
+        tiles: bytearray = bytearray(WIDTH * HEIGHT),
+        pikis: list[tuple[int, int, int]] = [],
+        raw: bytes | bytearray = bytearray(0),
+        unk01: int = 0,
+        use_custom_treasure: bool = False,
     ):
         super().__init__(index, WIDTH, HEIGHT, 1, [tiles], raw)
         self.pikis = pikis
@@ -37,15 +38,16 @@ class Level(LevelBase):
         use_custom_treasure = level[2] > 0
         layers = level[HEADER_LEN:]
         tiles = layers[:LAYER_LEN]
-        pikis_bytes = layers[LAYER_LEN:LAYER_LEN+PIKIS_LEN]
-        pikis = []
-        for i in range(0, 33, 3): # 11 pikis total
+        pikis_bytes = layers[LAYER_LEN : LAYER_LEN + PIKIS_LEN]
+        pikis: list[tuple[int, int, int]] = []
+        for i in range(0, 33, 3):  # 11 pikis total
             x = pikis_bytes[i]
-            y = pikis_bytes[i+1]
+            y = pikis_bytes[i + 1]
             # break if x,y = 0,0 (same as game)
-            if x == 0 and y == 0: break
+            if x == 0 and y == 0:
+                break
 
-            piki_type = pikis_bytes[i+2]
+            piki_type = pikis_bytes[i + 2]
             # skip if outside range (causes game crash)
             if piki_type > 4:
                 logger.warning(
@@ -64,8 +66,8 @@ class Level(LevelBase):
         raw.append(self.index)
         raw.append(self.unk01)
         raw.append(0xFF if self.use_custom_treasure else 0)
-        super().to_bytes(raw)
-        for i in range(0, 0x3f, 3):
+        super()._to_bytes(raw)
+        for i in range(0, 0x3F, 3):
             if len(self.pikis) > i // 3:
                 piki = self.pikis[i // 3]
                 raw.extend(piki)
@@ -76,31 +78,21 @@ class Level(LevelBase):
                 # this does unfortunately mean we will not get 1:1 input+output from vanilla levels
                 raw.extend([0, 0, 0])
         return bytes(raw)
-    
+
     def get_tile(self, x: int, y: int) -> Tile:
         """Gets the Tile at (x, y)."""
-        value = super().get_tile(x, y, 0)
+        value = super()._get_tile(x, y, 0)
         if value not in Tile._value2member_map_:
             raise ValueError(f"Unknown Tile with value {value}")
         return Tile(value)
 
     def set_tile(self, x: int, y: int, tile: Tile):
         """Sets the Tile at (x, y)."""
-        super().set_tile(x, y, tile.value, 0)
+        super()._set_tile(x, y, tile.value, 0)
 
     def set_tiles(self, x: int, y: int, w: int, h: int, tile: Tile):
         """Sets the Tiles from (x, y) to (w, h)."""
-        super().set_tiles(x, y, w, h, tile.value, 0)
-
-    def clear_all(self):
-        """Sets all Tiles to value 0x60 and removes all Pikmin."""
-        for i in range(self.layers):
-            super().set_tiles(0, 0, self.width, self.height, 0x60, i)
-        self.clear_pikis()
-
-    def clear_pikis(self):
-        """Removes all Pikis currently in the level."""
-        self.pikis.clear()
+        super()._set_tiles(x, y, w, h, tile.value, 0)
 
     def add_piki(self, x: int, y: int, piki: Piki):
         """Places a Piki at (x, y). Cannot be (0, 0)."""
@@ -109,3 +101,13 @@ class Level(LevelBase):
         if len(self.pikis) >= 20:
             raise ValueError("Marching Pikmin is limited to 20 Pikmin.")
         self.pikis.append((x, y, piki.value))
+
+    def clear_all(self):
+        """Sets all Tiles to value 0x60 and removes all Pikmin."""
+        for i in range(self.layers):
+            super()._set_tiles(0, 0, self.width, self.height, 0x60, i)
+        self.clear_pikis()
+
+    def clear_pikis(self):
+        """Removes all Pikis currently in the level."""
+        self.pikis.clear()

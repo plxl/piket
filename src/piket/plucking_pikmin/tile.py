@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class Tile(Enum):
     NONE = 0
     GRASS = 1

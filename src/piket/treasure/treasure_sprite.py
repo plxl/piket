@@ -8,9 +8,10 @@ import logging
 
 logger = logging.getLogger(__file__)
 
+
 class TreasureSprite:
     """Treasure Sprite data class for decoding and encoding GBA sprite data
-    
+
     Follow this guide for creating custom treasures:
     1. Use `treasure.export_palette("out.pal")` to get the (*.pal) file
     2. Open YY-CHR and go to "Palette" > "Open RGB Palette (*.pal)..." and select the exported palette
@@ -28,10 +29,10 @@ class TreasureSprite:
 
     def __init__(
         self,
-        header  = bytes(2),
-        palette = bytes(0x20),
-        sprites = bytes(0x280),
-        name    = bytes(0x32),
+        header: bytes = bytes(2),
+        palette: bytes = bytes(0x20),
+        sprites: bytes = bytes(0x280),
+        name: bytes = bytes(0x32),
     ):
         def check_size(b: bytes, expected: int, name: str):
             if len(b) != expected:
@@ -40,15 +41,15 @@ class TreasureSprite:
                     f"expected {hex(expected)}, got: {hex(len(b))}"
                 )
 
-        check_size(header,  2,     "header")
-        check_size(palette, 0x20,  "palette")
+        check_size(header, 2, "header")
+        check_size(palette, 0x20, "palette")
         check_size(sprites, 0x280, "sprites")
-        check_size(name,    0x32,  "name")
-        
-        self.header  = header
+        check_size(name, 0x32, "name")
+
+        self.header = header
         self.palette = bytearray(palette)
         self.sprites = bytearray(sprites)
-        self.name    = name
+        self.name = name
 
     @classmethod
     def from_bytes(cls, data: bytes | bytearray) -> Self:
@@ -85,14 +86,14 @@ class TreasureSprite:
         out.extend(self.name)
 
         # validate size
-        if len(out) < 0x2e4:
+        if len(out) < 0x2E4:
             logger.warning(
                 f"PIKMINOTAKARA size less than expected 0x2e4, got {hex(len(out))}.\n"
                 f"The block will be padded to 0x2e4."
             )
-            out = out.ljust(0x2e4, b"\x00")
+            out = out.ljust(0x2E4, b"\x00")
 
-        elif len(out) > 0x2e4:
+        elif len(out) > 0x2E4:
             raise ValueError(
                 f"Card treasure sprite data is too large. "
                 f"Expected <= 0x2e4, got {hex(len(out))}"
@@ -100,23 +101,23 @@ class TreasureSprite:
 
         return bytes(out)
 
-    # palette conversion
+    # --- palette conversion ---
     @staticmethod
-    def gba_to_rgb(col16) -> tuple[int, int, int]:
+    def gba_to_rgb(col16: int) -> tuple[int, int, int]:
         r = (col16 & 0x1F) << 3
         g = ((col16 >> 5) & 0x1F) << 3
         b = ((col16 >> 10) & 0x1F) << 3
         return (r, g, b)
 
     @staticmethod
-    def rgb_to_gba(rgb):
+    def rgb_to_gba(rgb: tuple[int, int, int]):
         r, g, b = rgb
         return (r >> 3) | ((g >> 3) << 5) | ((b >> 3) << 10)
 
     def get_palette_as_rgb(self) -> list[tuple[int, int, int]]:
         """Gets this treasure's palette as a list of 16 RGB values like (R, G, B)."""
         return [
-            self.gba_to_rgb(struct.unpack('<H', self.palette[i:i+2])[0])
+            self.gba_to_rgb(struct.unpack("<H", self.palette[i : i + 2])[0])
             for i in range(0, 0x20, 2)
         ]
 
@@ -125,21 +126,21 @@ class TreasureSprite:
         out = bytearray()
         for rgb in colours[:16]:
             # extends with little endian unsigned short
-            out += struct.pack('<H', self.rgb_to_gba(rgb))
+            out += struct.pack("<H", self.rgb_to_gba(rgb))
         self.palette = bytes(out)
 
-    # tile conversion
+    # --- tile conversion ---
     @staticmethod
-    def decode_4bpp_tile(tile_bytes) -> list[list[int]]:
+    def decode_4bpp_tile(tile_bytes: bytes) -> list[list[int]]:
         """Decodes a 32 byte 8x8 4BPP tile to 8x8 list."""
-        tile = [[0]*8 for _ in range(8)]
+        tile = [[0] * 8 for _ in range(8)]
 
         for y in range(8):
             for x in range(4):
-                byte = tile_bytes[y*4 + x]
+                byte = tile_bytes[y * 4 + x]
                 # split byte into 2 pixels
-                tile[y][x*2] = byte & 0xF
-                tile[y][x*2+1] = byte >> 4
+                tile[y][x * 2] = byte & 0xF
+                tile[y][x * 2 + 1] = byte >> 4
 
         return tile
 
@@ -151,29 +152,23 @@ class TreasureSprite:
             for x in range(0, 8, 2):
                 # pixel A in low 4 bits
                 # pixel B in high 4 bits
-                out.append(tile[y][x] | (tile[y][x+1] << 4))
+                out.append(tile[y][x] | (tile[y][x + 1] << 4))
 
         return bytes(out)
 
-    # sprite encoder/decode
+    # --- sprite encoder/decode ---
     def sprite_to_image(
-        self,
-        sprite_bytes: bytes,
-        layout: list[list[int]],
-        tile_count: int,
-        width: int,
-        height: int
+        self, sprite_bytes: bytes, layout: list[list[int]], tile_count: int, width: int, height: int
     ) -> Image.Image:
         """Converts the sprite binary data to an Image, using the palette data."""
 
         # get tiles from sprite data
         tiles = [
-            self.decode_4bpp_tile(sprite_bytes[i*32:(i+1)*32])
-            for i in range(tile_count)
+            self.decode_4bpp_tile(sprite_bytes[i * 32 : (i + 1) * 32]) for i in range(tile_count)
         ]
 
         # new image in palette-based mode
-        img = Image.new('P', (width, height))
+        img = Image.new("P", (width, height))
 
         # get palette data
         palette = self.get_palette_as_rgb()
@@ -186,13 +181,13 @@ class TreasureSprite:
                 tile = tiles[tile_idx]
                 for y in range(8):
                     for x in range(8):
-                        img.putpixel((tx*8 + x, ty*8 + y), tile[y][x])
+                        img.putpixel((tx * 8 + x, ty * 8 + y), tile[y][x])
 
         return img
 
     def image_to_sprite(self, img: Image.Image, layout: list[list[int]], tile_count: int):
         """Converts an Image into sprite binary data."""
-        img = img.convert('P')
+        img = img.convert("P")
         sprite_bytes = bytearray()
 
         # some gba formats have different tile layouts
@@ -201,18 +196,15 @@ class TreasureSprite:
             for tx, _ in enumerate(row):
                 # extract 8x8 tile starting at (tx * 8, ty * 8)
                 tile = [
-                    [
-                        cast(int, img.getpixel((tx * 8 + x, ty * 8 + y)))
-                        for x in range(8)
-                    ]
+                    [cast(int, img.getpixel((tx * 8 + x, ty * 8 + y))) for x in range(8)]
                     for y in range(8)
                 ]
                 sprite_bytes.extend(self.encode_4bpp_tile(tile))
 
         # limit total sprite bytes to tile count
-        return bytes(sprite_bytes[:tile_count * 32])
+        return bytes(sprite_bytes[: tile_count * 32])
 
-    # public methods
+    # --- public methods ---
     def export_small(self, path: str | Path | None = None) -> Image.Image:
         layout = [[0, 1], [2, 3]]
         small_sprite = self.sprites[:0x80]
@@ -260,7 +252,6 @@ class TreasureSprite:
         self.sprites[:0x80] = self.image_to_sprite(img, layout, 4)
 
     def import_large(self, sprite: str | Path | BytesIO | Image.Image):
-        
         layout = [
             [0, 1, 2, 3],
             [4, 5, 6, 7],
@@ -299,7 +290,7 @@ class TreasureSprite:
         """Exports 16-bit palette data to (*.pal) file."""
         if isinstance(path, str | Path):
             # pad to 0x200
-            palette = bytearray(self.palette).ljust(0x200, b'\x00')
+            palette = bytearray(self.palette).ljust(0x200, b"\x00")
             Path(path).write_bytes(palette)
 
         return self.palette

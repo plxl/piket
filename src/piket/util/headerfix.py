@@ -26,7 +26,7 @@ def _get_global_checksum(header: bytes, data: bytes) -> int:
     total = sum(header[:0x2F])
     for i in range(0, len(data), 0x30):
         xor = 0
-        for b in data[i:i+0x30]:
+        for b in data[i : i + 0x30]:
             xor ^= b
         total += xor
     return (~total) & 0xFF
@@ -54,14 +54,14 @@ def headerfix(input_data: bytes | bytearray) -> bytes:
     buffer = bytearray(input_data)
     header = buffer[:HEADER_SIZE]
 
-    if header[0x1A:0x1A + 8] != SIGNATURE:
+    if header[0x1A : 0x1A + 8] != bytearray(SIGNATURE):
         raise ValueError("Invalid e-Card signature")
 
     data_size = (header[0x06] << 8) + header[0x07]
     if data_size + HEADER_SIZE > len(buffer):
         raise ValueError("Data size in header exceeds buffer size")
 
-    data = buffer[HEADER_SIZE:HEADER_SIZE + data_size]
+    data = buffer[HEADER_SIZE : HEADER_SIZE + data_size]
 
     # checksums
     data_checksum = _get_data_checksum(data)

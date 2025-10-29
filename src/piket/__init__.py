@@ -18,8 +18,9 @@ _TOOLS = {
         "libnedclib": "libnedclib.so",
         "nedcenc": "nedcenc",
         "nevpk": "nevpk",
-    }
+    },
 }
+
 
 def get_machine():
     os_name = sys.platform
@@ -46,7 +47,7 @@ def get_machine():
 
 # validate platform os support
 machine = get_machine()
-plat = machine[:machine.index("-")]
+plat = machine[: machine.index("-")]
 platform_tools = _TOOLS.get(plat)
 if not platform_tools:
     raise OSError(f"Piket currently does not support: {machine}")
@@ -74,8 +75,18 @@ from . import plucking_pikmin as PluckingPikmin
 from . import marching_pikmin as MarchingPikmin
 
 __all__ = [
-    "NEDCENC", "NEVPK", # tools
-    "decode", "encode", "get_id", # direct methods
-    "Card", "Treasure", # primary classes
-    "ConnectingPikmin", "PluckingPikmin", "MarchingPikmin", # level classes
+    # tools
+    "NEDCENC",
+    "NEVPK",
+    # direct methods
+    "decode",
+    "encode",
+    "get_id",
+    # primary classes
+    "Card",
+    "Treasure",
+    # level classes
+    "ConnectingPikmin",
+    "PluckingPikmin",
+    "MarchingPikmin",
 ]

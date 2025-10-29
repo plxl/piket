@@ -4,7 +4,7 @@ from pathlib import Path
 
 logger = logging.getLogger(__file__)
 
-def _to_bytes(data: bytes | bytearray | str | Path) -> bytes:
+def to_bytes(data: bytes | bytearray | str | Path) -> bytes:
     if isinstance(data, (bytes, bytearray)):
         return bytes(bytearray(data))
     elif isinstance(data, (str, Path)):
@@ -13,7 +13,7 @@ def _to_bytes(data: bytes | bytearray | str | Path) -> bytes:
     else:
         raise TypeError("Expected bytes, bytearray, or file path (str/Path).")
 
-def _run_tool(command: str):
+def run_tool(command: str):
     result = subprocess.run(
         command,
         capture_output=True,

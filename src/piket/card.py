@@ -1,5 +1,5 @@
 from pathlib import Path
-from .util import _to_bytes, decode, decompress, encode
+from .util import to_bytes, decode, decompress, encode
 from .constants import *
 from pathlib import Path
 from . import (
@@ -31,7 +31,7 @@ class Card:
             self.footer = FOOTER_NORMAL
 
         else:
-            in_bytes = _to_bytes(card)
+            in_bytes = to_bytes(card)
             in_footer = in_bytes[-5:]
             # determine type of input bytes (card.raw, card_decoded.bin, card_decompressed.bin)
             if in_footer == FOOTER_NORMAL or in_footer == FOOTER_CONNECTING_X3:

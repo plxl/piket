@@ -2,14 +2,14 @@ import logging
 from pathlib import Path
 from piket import NEDCENC, NEVPK
 from piket.constants import VPK_SIZE, VPK
-from . import _to_bytes, _run_tool
+from . import to_bytes, run_tool
 
 logger = logging.getLogger(__file__)
 PARENT = NEDCENC.parent.resolve()
 
 def decode(data: bytes | bytearray | str | Path, partial_decode: bool = False) -> bytearray:
     # handle all input types
-    data = _to_bytes(data)
+    data = to_bytes(data)
     file = NEDCENC.parent.resolve() / "in.raw"
     logger.debug(f"Writing .raw data to '{file}'.")
     file.write_bytes(data)
@@ -17,7 +17,7 @@ def decode(data: bytes | bytearray | str | Path, partial_decode: bool = False) -
     # decode .raw to .bin (includes a vpk compression block which we will extract)
     decoded_path = PARENT / "decoded.bin"
     logger.debug(f"Running nedcenc, output to '{decoded_path}'.")
-    _run_tool(f'"{NEDCENC}" -i "{file}" -d -o "{decoded_path}"')
+    run_tool(f'"{NEDCENC}" -i "{file}" -d -o "{decoded_path}"')
     logger.debug(f"Removing '{file}'.")
     file.unlink()
     if not decoded_path.exists():
@@ -45,7 +45,7 @@ def decompress(decoded: bytes) -> bytes:
     # decompress the vpk block into pure level data (.bin again)
     decompressed_path = PARENT / "out.bin"
     logger.debug(f"Running nevpk, output to '{decompressed_path}'.")
-    _run_tool(f'"{NEVPK}" -i "{trimmed_path}" -d -o "{decompressed_path}"')
+    run_tool(f'"{NEVPK}" -i "{trimmed_path}" -d -o "{decompressed_path}"')
     logger.debug(f"Removing '{trimmed_path}'.")
     trimmed_path.unlink()
 

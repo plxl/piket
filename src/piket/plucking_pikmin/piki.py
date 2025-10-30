@@ -6,6 +6,6 @@ class Piki(Enum):
     RED = 1
     BLUE = 2
     YELLOW = 3
-    RED_PLUCKED = 4
-    BLUE_PLUCKED = 5
-    YELLOW_PLUCKED = 6
+    RED_PLUCKED = 5
+    BLUE_PLUCKED = 6
+    YELLOW_PLUCKED = 7

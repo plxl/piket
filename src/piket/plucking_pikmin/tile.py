@@ -9,3 +9,4 @@ class Tile(Enum):
     WATER = 4
     ELECTRICITY_NODE = 5
     ELECTRICTY = 6
+    SLIME_GRASS = 0x9b

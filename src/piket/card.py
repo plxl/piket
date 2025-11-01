@@ -78,13 +78,13 @@ class Card:
                 - 3 x Plucking
                 """
                 start = LEVELS_START + LEVEL_ID_LENGTH
-                FULL_LEVEL = LEVEL_ID_LENGTH + PLUCKING_PIKMIN_LENGTH
+                full_level = LEVEL_ID_LENGTH + PLUCKING_PIKMIN_LENGTH
                 for i in range(3):
-                    end = min(start + FULL_LEVEL, len(self.leveldata) - LEVEL_FOOTER_LENGTH)
+                    end = min(start + full_level, len(self.leveldata) - LEVEL_FOOTER_LENGTH)
                     level_data = self.leveldata[start:end]
                     level = P.Level.from_bytes(level_data)
                     self.levels.append(level)
-                    start += FULL_LEVEL
+                    start += full_level
 
             elif self.id == CARD_SET_B_MARCHING or self.id == CARD_SET_D_PRESIDENT:
                 """
@@ -92,13 +92,13 @@ class Card:
                 - 3 x Marching
                 """
                 start = LEVELS_START * 2 + LEVEL_ID_LENGTH
-                FULL_LEVEL = LEVEL_ID_LENGTH + MARCHING_PIKMIN_LENGTH
+                full_level = LEVEL_ID_LENGTH + MARCHING_PIKMIN_LENGTH
                 for i in range(3):
-                    end = start + FULL_LEVEL
+                    end = start + full_level
                     level_data = self.leveldata[start:end]
                     level = M.Level.from_bytes(level_data)
                     self.levels.append(level)
-                    start += FULL_LEVEL
+                    start += full_level
 
             elif self.id == CARD_SET_C_CONNECTING or self.id == CARD_SET_D_LOUIE:
                 """
@@ -188,7 +188,7 @@ class Card:
         """
         self.treasure = TreasureSprite.from_bytes(treasure.data)
 
-    def encode(self, partial_encode=False, raw_level=False) -> bytes:
+    def encode(self, partial_encode: bool = False, raw_level: bool = False) -> bytes:
         new_leveldata = bytearray()
         for i, level in enumerate(self.levels):
             if i > 2:
@@ -205,6 +205,7 @@ class Card:
                     # always 0x200 padding before first Marching Pikmin level
                     new_leveldata.extend(self.leveldata[:0x200])
 
+            assert isinstance(level, (P.Level, M.Level, C.Level))
             level_bytes = level.to_bytes()
 
             # size and padding is different for each level
@@ -222,7 +223,7 @@ class Card:
                 if i == 1 and self.id not in [CARD_SET_B_MARCHING, CARD_SET_D_PRESIDENT]:
                     padding = 0x200
 
-            elif isinstance(level, C.Level):
+            else:
                 expected_size = 0xA5
                 # non-last Connecting Pikmin levels are always padded to 0x100
                 if i < 2:

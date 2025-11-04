@@ -1,8 +1,9 @@
 from enum import Enum
 
 
+# fmt: off
 class Piki(Enum):
-    NONE           = 0
+    NONE           = 0x00
     RED_LEFT       = 0x10
     RED_DOWN       = 0x11
     RED_RIGHT      = 0x12
@@ -23,3 +24,4 @@ class Piki(Enum):
     WOLLYHOP_DOWN  = 0x51
     WOLLYHOP_RIGHT = 0x52
     WOLLYHOP_UP    = 0x53
+# fmt: on

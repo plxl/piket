@@ -3,6 +3,7 @@ from pathlib import Path
 
 
 class Treasure(Enum):
+    # fmt: off
     TEAR_STONE            = "ティア・ストーン"
     PINK_MENACE           = "オーバーキル・レッド"
     SCIENCE_PROJECT       = "ラブリー押し葉"
@@ -16,6 +17,7 @@ class Treasure(Enum):
 
     # custom treasures: feel free to make a PR with your own creations
     FUEL_RESERVOIR        = "Fuel Reservoir"
+    # fmt: on
 
     @property
     def data(self) -> bytes:

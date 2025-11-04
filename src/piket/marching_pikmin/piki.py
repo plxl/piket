@@ -1,8 +1,8 @@
-from enum import Enum
+from enum import IntEnum
 
 
 # fmt: off
-class Piki(Enum):
+class Piki(IntEnum):
     RED     = 0
     BLUE    = 1
     YELLOW  = 2

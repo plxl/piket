@@ -1,8 +1,8 @@
-from enum import Enum
+from enum import IntEnum
 
 
 # fmt: off
-class Player(Enum):
+class Player(IntEnum):
     OLIMAR  = 0
     LOUIE   = 1
 # fmt: on

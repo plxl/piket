@@ -1,8 +1,8 @@
-from enum import Enum
+from enum import IntEnum
 
 
 # fmt: off
-class Tile(Enum):
+class Tile(IntEnum):
     GROUND          = 0x00
     FIRE            = 0x10
     WATER           = 0x11

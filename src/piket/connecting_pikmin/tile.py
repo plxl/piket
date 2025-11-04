@@ -1,8 +1,8 @@
-from enum import Enum
+from enum import IntEnum
 
 
 # fmt: off
-class Tile(Enum):
+class Tile(IntEnum):
     ALL = 0
     HORIZONTAL      = 1
     VERTICAL        = 2

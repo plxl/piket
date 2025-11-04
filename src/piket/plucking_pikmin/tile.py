@@ -1,8 +1,8 @@
-from enum import Enum
+from enum import IntEnum
 
 
 # fmt: off
-class Tile(Enum):
+class Tile(IntEnum):
     NONE                = 0x00
     GRASS               = 0x01
     ROCK                = 0x02

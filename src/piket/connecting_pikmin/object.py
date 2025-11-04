@@ -1,8 +1,8 @@
-from enum import Enum
+from enum import IntEnum
 
 
 # fmt: off
-class Object(Enum):
+class Object(IntEnum):
     NONE        = 0
     FIRE        = 1
     WATER       = 2

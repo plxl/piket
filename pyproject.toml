@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "piket"
-version = "0.3.0"
+version = "0.3.1"
 description = "Pikmin e+ Card Tools, a library for manipulating Pikmin e+ cards"
 authors = [{ name = "plxl" }]
 readme = "README.md"
@@ -15,10 +15,10 @@ dependencies = ["pillow==12.0.0"]
 demo = ["tkinterdnd2==0.4.3"]
 
 [tool.setuptools]
-package-dir = {"" = "src"}
+package-dir = { "" = "src" }
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
-piket = ["bin/*/**"]
+piket = ["bin/*/**", "treasure/sprites/fuel_reservoir.bin"]

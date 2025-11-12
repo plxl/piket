@@ -6,14 +6,8 @@ __pycache__/
 dist/
 build/
 
-# treasure sprite binary data
-src/piket/treasure/sprites/aquatic_mine.bin
-src/piket/treasure/sprites/chocolate_cushion.bin
-src/piket/treasure/sprites/colossal_fossil.bin
-src/piket/treasure/sprites/danger_chime.bin
-src/piket/treasure/sprites/heavy_duty_magnetizer.bin
-src/piket/treasure/sprites/pink_menace.bin
-src/piket/treasure/sprites/science_project.bin
-src/piket/treasure/sprites/sunseed_berry.bin
-src/piket/treasure/sprites/tear_stone.bin
-src/piket/treasure/sprites/the_key.bin
+# ignore vanilla treasure sprite binary data
+src/piket/treasure/sprites/*
+# include custom treasure sprites
+!src/piket/treasure/sprites/custom/
+!src/piket/treasure/sprites/custom/*.bin

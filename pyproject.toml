@@ -22,4 +22,4 @@ package-dir = { "" = "src" }
 where = ["src"]
 
 [tool.setuptools.package-data]
-piket = ["bin/*/**", "treasure/sprites/fuel_reservoir.bin"]
+piket = ["bin/*/**", "treasure/sprites/custom/*.bin"]

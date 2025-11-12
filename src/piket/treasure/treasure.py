@@ -21,7 +21,11 @@ class Treasure(Enum):
 
     @property
     def data(self) -> bytes:
-        path = Path(__file__).parent / "sprites" / (self.name.lower() + ".bin")
+        base = Path(__file__).parent / "sprites"
+        if list(Treasure).index(self) > 9:
+            base /= "custom"
+        path = base / f"{self.name.lower()}.bin"
+
         if not path.is_file():
             raise FileNotFoundError(
                 f"Treasure sprite data for '{self.name}' was not found.\n\n"
